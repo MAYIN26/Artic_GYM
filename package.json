@@ -1,0 +1,13 @@
+{
+  "name": "artic-gym",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sitio web y panel de administración de ARTIC GYM",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
