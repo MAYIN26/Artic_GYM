@@ -9,9 +9,10 @@
   const App = window.ArticApp;
   const { esc, clone } = App;
   const TOKEN_KEY = "articgym-admin-token";
-  // Contraseña solo para el modo demostración (sitio abierto sin servidor).
-  // En el servidor real la contraseña se define con la variable ADMIN_PASSWORD.
-  const DEMO_PASSWORD = "artic2026";
+  // Acceso de prueba para el modo demostración (sitio abierto sin servidor).
+  // En el servidor real se definen con las variables ADMIN_USER y ADMIN_PASSWORD.
+  const DEMO_USER = "Mayin26";
+  const DEMO_PASSWORD = "mayin7759";
 
   const ui = { root: null, draft: null, tab: "products", dirty: false, token: null, busy: false };
 
@@ -75,31 +76,34 @@
       <form class="admin-login" data-form="login">
         <img src="assets/img/logo.svg" alt="" width="64" height="64">
         <h2>Acceso de administrador</h2>
-        <p>Ingresa la contraseña para editar el catálogo, el café y los precios.</p>
+        <p>Ingresa tus datos para editar el catálogo, el café y los precios.</p>
+        <label class="field"><span>Usuario</span>
+          <input type="text" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+        </label>
         <label class="field"><span>Contraseña</span>
-          <input type="password" name="password" autocomplete="current-password" required autofocus>
+          <input type="password" name="password" autocomplete="current-password" required>
         </label>
         ${msg ? `<p class="admin-error">${esc(msg)}</p>` : ""}
         <button class="btn btn-primary" type="submit">Entrar</button>
-        ${App.Store.mode === "demo" ? `<p class="admin-hint">Modo demostración · contraseña: <code>${DEMO_PASSWORD}</code></p>` : ""}
+        ${App.Store.mode === "demo" ? `<p class="admin-hint">Modo demostración</p>` : ""}
       </form>`;
     const input = body().querySelector("input");
     setTimeout(() => input && input.focus(), 50);
   }
 
-  async function login(password) {
+  async function login(username, password) {
     if (App.Store.mode === "demo") {
-      if (password !== DEMO_PASSWORD) return renderLogin("Contraseña incorrecta.");
+      if (username.trim().toLowerCase() !== DEMO_USER.toLowerCase() || password !== DEMO_PASSWORD) return renderLogin("Usuario o contraseña incorrectos.");
       ui.demoAuthed = true;
       return startEditing();
     }
     try {
       const res = await fetch("api/login", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password })
+        body: JSON.stringify({ username, password })
       });
       const json = await res.json().catch(() => ({}));
-      if (!res.ok || !json.token) return renderLogin(json.error || "Contraseña incorrecta.");
+      if (!res.ok || !json.token) return renderLogin(json.error || "Usuario o contraseña incorrectos.");
       ui.token = json.token;
       try { sessionStorage.setItem(TOKEN_KEY, ui.token); } catch (e) { /* sin sessionStorage */ }
       startEditing();
@@ -330,7 +334,7 @@
     const form = e.target.closest("[data-form=login]");
     if (!form) return;
     e.preventDefault();
-    login(form.password.value);
+    login(form.username.value, form.password.value);
   }
 
   function onInput(e) {

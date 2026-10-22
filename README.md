@@ -23,13 +23,14 @@ assets/products/      Imágenes de muestra de la tienda
 Se necesita Node.js 18 o superior. No hay que instalar dependencias.
 
 ```bash
-ADMIN_PASSWORD="una-contraseña-segura" npm start
+ADMIN_USER="usuario" ADMIN_PASSWORD="una-contraseña-segura" npm start
 # http://localhost:3000
 ```
 
 | Variable | Uso | Valor por defecto |
 |---|---|---|
-| `ADMIN_PASSWORD` | Contraseña del panel | `artic2026` (solo para pruebas) |
+| `ADMIN_USER` | Usuario del panel | `Mayin26` (acceso de prueba) |
+| `ADMIN_PASSWORD` | Contraseña del panel | `mayin7759` (acceso de prueba) |
 | `PORT` | Puerto | `3000` |
 | `DATA_DIR` | Carpeta donde se guardan datos y fotos subidas | `./storage` |
 
@@ -47,7 +48,7 @@ Sirve cualquier hosting de Node.js con **disco persistente**, por ejemplo:
 
 ### Modo demostración
 
-Si se abre `index.html` sin el servidor (por ejemplo, en GitHub Pages o con doble clic), el sitio funciona igual y el panel entra en **modo demostración** (contraseña `artic2026`). En este modo los cambios se guardan solo en el navegador de quien edita, y así lo indica un aviso en el panel.
+Si se abre `index.html` sin el servidor (por ejemplo, en GitHub Pages o con doble clic), el sitio funciona igual y el panel entra en **modo demostración** (usuario `Mayin26`, contraseña `mayin7759`). En este modo los cambios se guardan solo en el navegador de quien edita, y así lo indica un aviso en el panel.
 
 ## Panel de administración
 
@@ -63,6 +64,7 @@ Las fotos se reducen automáticamente en el navegador antes de subirse.
 
 ## Pendientes por confirmar con el dueño
 
+- [ ] Cambiar el acceso de prueba por uno definitivo (`ADMIN_USER` / `ADMIN_PASSWORD`, y `DEMO_USER` / `DEMO_PASSWORD` en `js/admin.js`)
 - [ ] Número de WhatsApp (Panel › Contacto y redes)
 - [ ] Cuenta de TikTok
 - [ ] Precios reales del café

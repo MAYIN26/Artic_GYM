@@ -6,10 +6,11 @@
  *
  * Sin dependencias: solo requiere Node.js 18 o superior.
  *
- *   ADMIN_PASSWORD=tu-contraseña node server.js
+ *   ADMIN_USER=tu-usuario ADMIN_PASSWORD=tu-contraseña node server.js
  *
  * Variables de entorno:
  *   PORT            Puerto (por defecto 3000)
+ *   ADMIN_USER      Usuario del panel (por defecto el de prueba)
  *   ADMIN_PASSWORD  Contraseña del panel (obligatorio en producción)
  *   DATA_DIR        Carpeta donde se guardan datos y fotos (por defecto ./storage)
  */
@@ -26,14 +27,15 @@ const PORT = Number(process.env.PORT) || 3000;
 const DATA_DIR = path.resolve(process.env.DATA_DIR || path.join(ROOT, "storage"));
 const DATA_FILE = path.join(DATA_DIR, "data.json");
 const UPLOAD_DIR = path.join(DATA_DIR, "uploads");
-const PASSWORD = process.env.ADMIN_PASSWORD || "artic2026";
+const USER = process.env.ADMIN_USER || "Mayin26";
+const PASSWORD = process.env.ADMIN_PASSWORD || "mayin7759";
 const TOKEN_TTL = 12 * 60 * 60 * 1000;
 const MAX_JSON = 2 * 1024 * 1024;
 const MAX_UPLOAD = 8 * 1024 * 1024;
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
 if (!process.env.ADMIN_PASSWORD) {
-  console.warn("⚠  ADMIN_PASSWORD no está definida; usando la contraseña de demostración.");
+  console.warn("⚠  ADMIN_PASSWORD no está definida; usando el acceso de prueba.");
 }
 fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
@@ -59,7 +61,11 @@ const tokens = new Map();
 const attempts = new Map();
 
 function sha(s) { return crypto.createHash("sha256").update(String(s)).digest(); }
-function passwordOk(input) { return crypto.timingSafeEqual(sha(input), sha(PASSWORD)); }
+function credentialsOk(user, pass) {
+  const userOk = crypto.timingSafeEqual(sha(String(user).trim().toLowerCase()), sha(USER.toLowerCase()));
+  const passOk = crypto.timingSafeEqual(sha(pass), sha(PASSWORD));
+  return userOk && passOk;
+}
 
 function issueToken() {
   const t = crypto.randomBytes(32).toString("hex");
@@ -134,9 +140,9 @@ async function api(req, res, pathname) {
   if (pathname === "/api/login" && req.method === "POST") {
     if (tooManyAttempts(ip)) return json(res, 429, { error: "Demasiados intentos. Espera 15 minutos." });
     const body = await readBody(req, 10 * 1024);
-    if (typeof body.password !== "string" || !passwordOk(body.password)) {
+    if (typeof body.username !== "string" || typeof body.password !== "string" || !credentialsOk(body.username, body.password)) {
       attempts.get(ip).n++;
-      return json(res, 401, { error: "Contraseña incorrecta." });
+      return json(res, 401, { error: "Usuario o contraseña incorrectos." });
     }
     attempts.delete(ip);
     return json(res, 200, { token: issueToken() });
